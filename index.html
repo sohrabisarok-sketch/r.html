@@ -1,0 +1,232 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R ❤️</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+<canvas id="heart"></canvas>
+
+<script>
+const canvas = document.getElementById("heart");
+const ctx = canvas.getContext("2d");
+
+let W = window.innerWidth;
+let H = window.innerHeight;
+
+canvas.width = W;
+canvas.height = H;
+
+window.addEventListener("resize", () => {
+    W = window.innerWidth;
+    H = window.innerHeight;
+
+    canvas.width = W;
+    canvas.height = H;
+
+    makeRain();
+});
+
+
+// باران
+let rain = [];
+
+function makeRain() {
+    rain = [];
+
+    for (let i = 0; i < 150; i++) {
+        rain.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            speed: 2 + Math.random() * 5,
+            length: 5 + Math.random() * 12
+        });
+    }
+}
+
+makeRain();
+
+
+// شکل قلب
+function heart(t, scale) {
+
+    const x = 16 * Math.sin(t) ** 3;
+
+    const y =
+        13 * Math.cos(t)
+        - 5 * Math.cos(2 * t)
+        - 2 * Math.cos(3 * t)
+        - Math.cos(4 * t);
+
+    return {
+        x: W / 2 + x * scale,
+        y: H / 2 - y * scale
+    };
+}
+
+
+let frame = 0;
+
+
+function draw() {
+
+    // پس زمینه
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, W, H);
+
+
+    // باران
+    ctx.strokeStyle = "rgba(255, 0, 100, 0.35)";
+    ctx.lineWidth = 1;
+
+    for (let drop of rain) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(drop.x, drop.y);
+        ctx.lineTo(drop.x, drop.y + drop.length);
+
+        ctx.stroke();
+
+        drop.y += drop.speed;
+
+        if (drop.y > H) {
+            drop.y = -20;
+            drop.x = Math.random() * W;
+        }
+    }
+
+
+    // ضربان قلب
+    const pulse = 19 + Math.sin(frame * 0.12) * 2;
+
+
+    // نقاط قلب
+    const points = [];
+
+    for (let i = 0; i <= 300; i++) {
+
+        const t = (Math.PI * 2 * i) / 300;
+
+        const p = heart(t, pulse);
+
+        points.push(p);
+    }
+
+
+    // قلب
+    function drawHeart(color, width, blur) {
+
+        ctx.beginPath();
+
+        for (let i = 0; i < points.length; i++) {
+
+            const p = points[i];
+
+            if (i === 0) {
+                ctx.moveTo(p.x, p.y);
+            } else {
+                ctx.lineTo(p.x, p.y);
+            }
+        }
+
+        ctx.closePath();
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+
+        ctx.shadowBlur = blur;
+        ctx.shadowColor = "#ff0066";
+
+        ctx.stroke();
+    }
+
+
+    // Glow
+    drawHeart("#330019", 25, 40);
+
+    drawHeart("#ff0066", 8, 25);
+
+    drawHeart("#ffffff", 2, 10);
+
+
+    // R
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.font = "bold 90px Arial";
+
+    // هاله صورتی
+    ctx.shadowBlur = 40;
+    ctx.shadowColor = "#ff0066";
+    ctx.fillStyle = "#ff0066";
+
+    ctx.fillText(
+        "R",
+        W / 2,
+        H / 2
+    );
+
+
+    // R سفید
+    ctx.font = "bold 78px Arial";
+
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = "#ffffff";
+    ctx.fillStyle = "#ffffff";
+
+    ctx.fillText(
+        "R",
+        W / 2,
+        H / 2
+    );
+
+
+    // متن پایین
+    ctx.font = "bold 22px Arial";
+
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = "#ff0066";
+
+    ctx.fillStyle = "#ff0066";
+
+    ctx.fillText(
+        "♥  R  ♥",
+        W / 2,
+        H - 60
+    );
+
+
+    frame++;
+
+    requestAnimationFrame(draw);
+}
+
+draw();
+
+</script>
+
+</body>
+</html>
+```
